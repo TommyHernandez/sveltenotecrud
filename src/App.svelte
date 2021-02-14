@@ -25,10 +25,14 @@
       .doc()
       .set({ ...taskState, createdAt: Date.now() });
     toastr.success("Note added", "All Ok dude");
+    taskState = {
+      name: "",
+      description: "",
+    };
   };
   const handleSubmit = () => {
     if (!editStatus) {
-      if (taskState.description.lenght > 2) {
+      if (taskState.description.length > 2) {
         addTask();
       } else {
         toastr.error("Description should have more than 2 characters", "Error");
@@ -36,10 +40,6 @@
     } else {
       updateTask();
     }
-    taskState = {
-      name: "",
-      description: "",
-    };
   };
   const deleteTask = async (id) => {
     await db.collection("task").doc(id).delete();
@@ -59,14 +59,24 @@
     toastr.info("Closed");
   };
   const updateTask = async () => {
-    await db.collection("task").doc(currentID).update(taskState);
+    if (taskState.description.length > 2) {
+      await db.collection("task").doc(currentID).update(taskState);
+      toastr.success("Good Job!", "Updated");
+      taskState = {
+        name: "",
+        description: "",
+	  };
+	  editStatus = false;
+    } else {
+      toastr.error("Description should have more than 2 characters", "Error");
+	}
   };
 </script>
 
 <main>
   <section class="container p-4">
     <div class="row">
-      <div class="col-xs-12 col-md-8 offset-md-4 col-lg-6">
+      <div class="col-xs-12 col-md-8 offset-md-2 col-lg-6">
         <h1>Create your notes <i class="material-icons">note</i></h1>
         <form on:submit|preventDefault={handleSubmit} class="card card-body">
           <div class="form-group">
